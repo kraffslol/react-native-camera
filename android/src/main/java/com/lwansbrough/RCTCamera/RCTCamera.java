@@ -398,7 +398,7 @@ public class RCTCamera {
 
         // set preview size
         // defaults to highest resolution available
-        Camera.Size optimalPreviewSize = getBestSize(parameters.getSupportedPreviewSizes(), Integer.MAX_VALUE, Integer.MAX_VALUE);
+        Camera.Size optimalPreviewSize = getBestSize(parameters.getSupportedPreviewSizes(), 1280, 720);
         int width = optimalPreviewSize.width;
         int height = optimalPreviewSize.height;
 
