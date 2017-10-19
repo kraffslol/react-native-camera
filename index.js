@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 import {
   DeviceEventEmitter, // android
   NativeAppEventEmitter, // ios
@@ -9,57 +9,58 @@ import {
   requireNativeComponent,
   View,
   ViewPropTypes
-} from 'react-native';
+} from "react-native";
 
 const CameraManager = NativeModules.CameraManager || NativeModules.CameraModule;
-const CAMERA_REF = 'camera';
+const CAMERA_REF = "camera";
 
 function convertNativeProps(props) {
   const newProps = { ...props };
-  if (typeof props.aspect === 'string') {
+  if (typeof props.aspect === "string") {
     newProps.aspect = Camera.constants.Aspect[props.aspect];
   }
 
-  if (typeof props.flashMode === 'string') {
+  if (typeof props.flashMode === "string") {
     newProps.flashMode = Camera.constants.FlashMode[props.flashMode];
   }
 
-  if (typeof props.orientation === 'string') {
+  if (typeof props.orientation === "string") {
     newProps.orientation = Camera.constants.Orientation[props.orientation];
   }
 
-  if (typeof props.torchMode === 'string') {
+  if (typeof props.torchMode === "string") {
     newProps.torchMode = Camera.constants.TorchMode[props.torchMode];
   }
 
-  if (typeof props.type === 'string') {
+  if (typeof props.type === "string") {
     newProps.type = Camera.constants.Type[props.type];
   }
 
-  if (typeof props.captureQuality === 'string') {
-    newProps.captureQuality = Camera.constants.CaptureQuality[props.captureQuality];
+  if (typeof props.captureQuality === "string") {
+    newProps.captureQuality =
+      Camera.constants.CaptureQuality[props.captureQuality];
   }
 
-  if (typeof props.captureMode === 'string') {
+  if (typeof props.captureMode === "string") {
     newProps.captureMode = Camera.constants.CaptureMode[props.captureMode];
   }
 
-  if (typeof props.captureTarget === 'string') {
-    newProps.captureTarget = Camera.constants.CaptureTarget[props.captureTarget];
+  if (typeof props.captureTarget === "string") {
+    newProps.captureTarget =
+      Camera.constants.CaptureTarget[props.captureTarget];
   }
 
   // do not register barCodeTypes if no barcode listener
-  if (typeof props.onBarCodeRead !== 'function') {
+  if (typeof props.onBarCodeRead !== "function") {
     newProps.barCodeTypes = [];
   }
 
-  newProps.barcodeScannerEnabled = typeof props.onBarCodeRead === 'function'
+  newProps.barcodeScannerEnabled = typeof props.onBarCodeRead === "function";
 
   return newProps;
 }
 
 export default class Camera extends Component {
-
   static constants = {
     Aspect: CameraManager.Aspect,
     BarCodeType: CameraManager.BarCodeType,
@@ -74,28 +75,13 @@ export default class Camera extends Component {
 
   static propTypes = {
     ...ViewPropTypes,
-    aspect: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number
-    ]),
+    aspect: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     captureAudio: PropTypes.bool,
-    captureMode: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number
-    ]),
-    captureQuality: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number
-    ]),
-    captureTarget: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number
-    ]),
+    captureMode: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    captureQuality: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    captureTarget: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     defaultOnFocusComponent: PropTypes.bool,
-    flashMode: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number
-    ]),
+    flashMode: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     keepAwake: PropTypes.bool,
     onBarCodeRead: PropTypes.func,
     barcodeScannerEnabled: PropTypes.bool,
@@ -104,19 +90,10 @@ export default class Camera extends Component {
     mirrorImage: PropTypes.bool,
     fixOrientation: PropTypes.bool,
     barCodeTypes: PropTypes.array,
-    orientation: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number
-    ]),
+    orientation: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     playSoundOnCapture: PropTypes.bool,
-    torchMode: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number
-    ]),
-    type: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number
-    ])
+    torchMode: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    type: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   };
 
   static defaultProps = {
@@ -133,7 +110,7 @@ export default class Camera extends Component {
     playSoundOnCapture: true,
     torchMode: CameraManager.TorchMode.off,
     mirrorImage: false,
-    barCodeTypes: Object.values(CameraManager.BarCodeType),
+    barCodeTypes: Object.values(CameraManager.BarCodeType)
   };
 
   static checkDeviceAuthorizationStatus = CameraManager.checkDeviceAuthorizationStatus;
@@ -153,11 +130,17 @@ export default class Camera extends Component {
   }
 
   async componentWillMount() {
-    this._addOnBarCodeReadListener()
+    this._addOnBarCodeReadListener();
 
-    let { captureMode } = convertNativeProps({ captureMode: this.props.captureMode })
-    let hasVideoAndAudio = this.props.captureAudio && captureMode === Camera.constants.CaptureMode.video
-    let check = hasVideoAndAudio ? Camera.checkDeviceAuthorizationStatus : Camera.checkVideoAuthorizationStatus;
+    let { captureMode } = convertNativeProps({
+      captureMode: this.props.captureMode
+    });
+    let hasVideoAndAudio =
+      this.props.captureAudio &&
+      captureMode === Camera.constants.CaptureMode.video;
+    let check = hasVideoAndAudio
+      ? Camera.checkDeviceAuthorizationStatus
+      : Camera.checkVideoAuthorizationStatus;
 
     if (check) {
       const isAuthorized = await check();
@@ -166,7 +149,7 @@ export default class Camera extends Component {
   }
 
   componentWillUnmount() {
-    this._removeOnBarCodeReadListener()
+    this._removeOnBarCodeReadListener();
 
     if (this.state.isRecording) {
       this.stopCapture();
@@ -174,26 +157,32 @@ export default class Camera extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    const { onBarCodeRead } = this.props
+    const { onBarCodeRead } = this.props;
     if (onBarCodeRead !== newProps.onBarCodeRead) {
-      this._addOnBarCodeReadListener(newProps)
+      this._addOnBarCodeReadListener(newProps);
     }
   }
 
   _addOnBarCodeReadListener(props) {
-    const { onBarCodeRead } = props || this.props
-    this._removeOnBarCodeReadListener()
+    const { onBarCodeRead } = props || this.props;
+    this._removeOnBarCodeReadListener();
     if (onBarCodeRead) {
       this.cameraBarCodeReadListener = Platform.select({
-        ios: NativeAppEventEmitter.addListener('CameraBarCodeRead', this._onBarCodeRead),
-        android: DeviceEventEmitter.addListener('CameraBarCodeReadAndroid',  this._onBarCodeRead)
-      })
+        ios: NativeAppEventEmitter.addListener(
+          "CameraBarCodeRead",
+          this._onBarCodeRead
+        ),
+        android: DeviceEventEmitter.addListener(
+          "CameraBarCodeReadAndroid",
+          this._onBarCodeRead
+        )
+      });
     }
   }
   _removeOnBarCodeReadListener() {
-    const listener = this.cameraBarCodeReadListener
+    const listener = this.cameraBarCodeReadListener;
     if (listener) {
-      listener.remove()
+      listener.remove();
     }
   }
 
@@ -204,9 +193,9 @@ export default class Camera extends Component {
     return <RCTCamera ref={CAMERA_REF} {...nativeProps} />;
   }
 
-  _onBarCodeRead = (data) => {
+  _onBarCodeRead = data => {
     if (this.props.onBarCodeRead) {
-      this.props.onBarCodeRead(data)
+      this.props.onBarCodeRead(data);
     }
   };
 
@@ -220,20 +209,43 @@ export default class Camera extends Component {
       target: props.captureTarget,
       quality: props.captureQuality,
       type: props.type,
-      title: '',
-      description: '',
+      title: "",
+      description: "",
       mirrorImage: props.mirrorImage,
       fixOrientation: props.fixOrientation,
       ...options
     };
 
     if (options.mode === Camera.constants.CaptureMode.video) {
-      options.totalSeconds = (options.totalSeconds > -1 ? options.totalSeconds : -1);
+      options.totalSeconds =
+        options.totalSeconds > -1 ? options.totalSeconds : -1;
       options.preferredTimeScale = options.preferredTimeScale || 30;
       this.setState({ isRecording: true });
     }
 
     return CameraManager.capture(options);
+  }
+
+  startPreview() {
+    if (Platform.OS === "android") {
+      const props = convertNativeProps(this.props);
+      CameraManager.startPreview({
+        type: props.type
+      });
+    } else {
+      CameraManager.startPreview();
+    }
+  }
+
+  stopPreview() {
+    if (Platform.OS === "android") {
+      const props = convertNativeProps(this.props);
+      CameraManager.stopPreview({
+        type: props.type
+      });
+    } else {
+      CameraManager.stopPreview();
+    }
   }
 
   stopCapture() {
@@ -249,7 +261,7 @@ export default class Camera extends Component {
   }
 
   hasFlash() {
-    if (Platform.OS === 'android') {
+    if (Platform.OS === "android") {
       const props = convertNativeProps(this.props);
       return CameraManager.hasFlash({
         type: props.type
@@ -261,16 +273,18 @@ export default class Camera extends Component {
 
 export const constants = Camera.constants;
 
-const RCTCamera = requireNativeComponent('RCTCamera', Camera, {nativeOnly: {
-  testID: true,
-  renderToHardwareTextureAndroid: true,
-  accessibilityLabel: true,
-  importantForAccessibility: true,
-  accessibilityLiveRegion: true,
-  accessibilityComponentType: true,
-  onLayout: true
-}});
+const RCTCamera = requireNativeComponent("RCTCamera", Camera, {
+  nativeOnly: {
+    testID: true,
+    renderToHardwareTextureAndroid: true,
+    accessibilityLabel: true,
+    importantForAccessibility: true,
+    accessibilityLiveRegion: true,
+    accessibilityComponentType: true,
+    onLayout: true
+  }
+});
 
 const styles = StyleSheet.create({
-  base: {},
+  base: {}
 });
