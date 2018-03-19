@@ -777,5 +777,15 @@ static NSDictionary *defaultFaceDetectorOptions = nil;
     }
 }
 
+- (void)startPreview
+{
+    [self.session startRunning];
+}
+
+- (void)stopPreview
+{
+    [self.session stopRunning];
+}
+
 @end
 
